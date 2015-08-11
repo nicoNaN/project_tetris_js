@@ -3,8 +3,8 @@
 "use strict";
 
 var view = {
-  init: function() {
-    this.attachDirListener();
+  init: function(block) {
+    this.attachDirListener(block);
     view.render();
   },
 
@@ -13,7 +13,7 @@ var view = {
     this.drawBoard();
     var totalScore = model.getScore();
     $("#score").text(totalScore);
-    this.drawSnake(model.getCurrentDirection());
+    this.drawBlocks();
   },
 
   clearField: function() {
@@ -36,21 +36,24 @@ var view = {
     }
   },
 
-  drawSnake: function(direction) {
+  drawBlocks: function() {
 
-    model.makeMove(direction);
-    controller.setCurrentDirection("down");
+    // model.makeMove(direction);
+    // controller.setCurrentDirection("down");
 
-    $("div[data-y='" + model.snakeHead.y + "'] div[data-x='" + model.snakeHead.x + "']").addClass('block');
-
+    model.blocks.forEach(function(block){
+      block.move();
+      block.resetDirection();
+      $("div[data-y='" + block.position.y + "'] div[data-x='" + block.position.x + "']").addClass('block');
+    });
   },
 
-  attachDirListener: function(){
+  attachDirListener: function(block){
     $(window).keydown(function(press) {
       if (press.which === 37) {
-         controller.setCurrentDirection("left");
+         block.currentDirection = "left";
       } else if (press.which === 39) {
-         controller.setCurrentDirection("right");
+         block.currentDirection = "right";
       }
     });
   }
@@ -58,59 +61,20 @@ var view = {
 
 var model = {
 
-  snakeHead: {
-    x: 1,
-    y: 1
-  },
-
-  currentDirection: "down",
+  blocks: [],
 
   gridSize: 10,
   totalScore: 0,
-
-  moveDown: function() {
-    this.snakeHead.y++;
-  },
-
-  moveLeft: function() {
-    this.snakeHead.x--;
-  },
-
-  moveRight: function() {
-    this.snakeHead.x++;
-  },
-
-  makeMove: function(direction) {
-    if (direction == "down") {
-      this.moveDown();
-    } else if (direction == "left") {
-      this.moveLeft();
-    } else if (direction == "right") {
-      this.moveRight();
-    }
-  },
 
   getScore: function() {
     return this.totalScore;
   },
 
-  getCurrentDirection: function() {
-    return this.currentDirection;
-  },
-
-  getSnakeX: function() {
-    return this.snakeHead.x;
-  },
-
-  getSnakeY: function() {
-    return this.snakeHead.y;
-  },
-
-  hitWall: function() {
-    return (model.snakeHead.x > model.gridSize ||
-            model.snakeHead.x < 1 ||
-            model.snakeHead.y < 1 ||
-            Math.abs(model.snakeHead.y) >= model.gridSize);
+  hitWall: function(block) {
+    return (block.position.x > model.gridSize ||
+            block.position.x < 1 ||
+            block.position.y < 1 ||
+            Math.abs(block.position.y) >= model.gridSize);
   }
 };
 
@@ -118,19 +82,16 @@ var controller = {
 
   // create a gameloop var, look how to set setInterval time
   init: function() {
+    var newBlock = new Block(1, 1);
+    model.blocks.push(newBlock);
+
     setInterval(function() {
-      if (model.hitWall()) {
-        console.log("hit wall");
-      } else
-        view.init();
-    }, 1500);
-    // setInterval(function() {
-    //   if (model.hitWall()) {
-    //     console.log("u ded");
-    //   } else {
-    //     view.init();
-    //   }
-    // }, 500);
+      if (model.hitWall(newBlock)) {
+        console.log("u ded");
+      } else {
+        view.init(newBlock);
+      }
+    }, 500);
   },
 
   setCurrentDirection: function(dir) {
