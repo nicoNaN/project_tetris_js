@@ -102,6 +102,7 @@ var controller = {
       model.currentBlock.stopped = true;
       if (this.rowIsFull(model.currentBlock)) {
         controller.clearRow(model.currentBlock);
+        controller.shiftDown();
       }
       model.currentBlock = new Block(2, 1);
       model.blocks.push(model.currentBlock);
@@ -117,8 +118,6 @@ var controller = {
 
   rowIsFull: function(block) {
     return ($(".row[data-y=" + block.position.y + "]").children().not('.block').length === 0);
-    // should maybe be in the view
-    // clears the blocks in a filled row
   },
 
   clearRow: function(block) {
@@ -128,6 +127,9 @@ var controller = {
   },
 
   shiftDown: function() {
+    model.blocks.forEach(function(block) {
+      block.position.y++;
+    });
     // should maybe be in the view
     // shifts all existing  blocks down after clearing
   }
