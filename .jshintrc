@@ -1,0 +1,6 @@
+{
+  "globalstrict": true,
+  "jquery": true,
+  "browser": true,
+  "globals" : { "prompt": true}
+}
