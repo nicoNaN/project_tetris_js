@@ -22,13 +22,13 @@ var view = {
 
   drawBoard: function() {
     for (var i = 1; i <= model.gridSize; i++) {
-      this.addRowsCols($("#tetris-grid"), model.gridSize, i);
+      this.addRowsCols($("#tetris-grid"), 10, i);
     }
   },
 
   addRowsCols: function(board, numColumns, rowVal) {
     board.append("<div class='row'" + " data-y=" + rowVal + "></div>");
-    for (var i = 1; i <= numColumns; i++) {
+    for (var i = 1; i < numColumns; i++) {
       $("#tetris-grid .row").last().append("<div class='col'" +
                                           " data-x=" +
                                           i +
@@ -37,14 +37,12 @@ var view = {
   },
 
   drawBlocks: function() {
-
-    // model.makeMove(direction);
-    // controller.setCurrentDirection("down");
-
     model.blocks.forEach(function(block){
+
       if (!block.stopped) {
         block.move();
       }
+
       block.resetDirection();
       $("div[data-y='" + block.position.y + "'] div[data-x='" + block.position.x + "']").addClass('block');
     });
@@ -63,26 +61,29 @@ var view = {
 
 var model = {
 
-  currentBlock: new Block(1, 1),
+  currentBlock: new Block(5, 1),
 
   blocks: [],
 
-  gridSize: 10,
+  gridSize: 20,
   totalScore: 0,
 
   getScore: function() {
     return this.totalScore;
   },
 
-  hitWall: function(block) {
-    return (block.position.x > model.gridSize ||
-            block.position.x < 1 ||
-            block.position.y < 1 ||
+  hitBottom: function(block) {
+    return (block.position.y < 1 ||
             Math.abs(block.position.y) >= model.gridSize);
   },
 
   hitBlock: function(block) {
     return $("div[data-y='" + (block.position.y + 1) + "'] div[data-x='" + block.position.x + "']").hasClass('block');
+  },
+
+  hitSide: function(block) {
+    return( block.position.x + 1 >= 10 ||
+            block.position.x - 1 < 1);
   }
 };
 
@@ -98,13 +99,13 @@ var controller = {
   },
 
   gameLoop: function() {
-    if (model.hitWall(model.currentBlock) || model.hitBlock(model.currentBlock)) {
+    if (model.hitBottom(model.currentBlock) || model.hitBlock(model.currentBlock)) {
       model.currentBlock.stopped = true;
       if (this.rowIsFull(model.currentBlock)) {
         controller.clearRow(model.currentBlock);
         controller.shiftDown();
       }
-      model.currentBlock = new Block(2, 1);
+      model.currentBlock = new Block(5, 1);
       model.blocks.push(model.currentBlock);
       view.init(model.currentBlock);
     } else {
@@ -131,7 +132,6 @@ var controller = {
       block.position.y++;
     });
     // should maybe be in the view
-    // shifts all existing  blocks down after clearing
   }
 };
 

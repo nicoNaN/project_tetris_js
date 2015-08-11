@@ -10,9 +10,13 @@ Block.prototype.move = function() {
   if (this.currentDirection == "down") {
     this.position.y++;
   } else if (this.currentDirection == "left") {
-    this.position.x--;
+    if (!model.hitSide(this)) {
+      this.position.x--;
+    }
   } else if (this.currentDirection == "right") {
-    this.position.x++;
+    if (!model.hitSide(this)) {
+      this.position.x++;
+    }
   }
 };
 
