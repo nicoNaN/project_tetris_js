@@ -100,7 +100,7 @@ var controller = {
   gameLoop: function() {
     if (model.hitWall(model.currentBlock) || model.hitBlock(model.currentBlock)) {
       model.currentBlock.stopped = true;
-      model.currentBlock = new Block(2, 2);
+      model.currentBlock = new Block(2, 1);
       model.blocks.push(model.currentBlock);
       view.init(model.currentBlock);
     } else {
@@ -110,6 +110,16 @@ var controller = {
 
   setCurrentDirection: function(dir) {
     model.currentDirection = dir;
+  },
+
+  clearRow: function() {
+    // should maybe be in the view
+    // clears the blocks in a filled row
+  },
+
+  shiftDown: function() {
+    // should maybe be in the view
+    // shifts all existing  blocks down after clearing
   }
 };
 
