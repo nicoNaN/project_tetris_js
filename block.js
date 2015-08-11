@@ -3,6 +3,7 @@
 function Block(x, y) {
   this.position = { x: x, y: y};
   this.currentDirection = "down";
+  this.stopped = false;
 }
 
 Block.prototype.move = function() {

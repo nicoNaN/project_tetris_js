@@ -42,7 +42,9 @@ var view = {
     // controller.setCurrentDirection("down");
 
     model.blocks.forEach(function(block){
-      block.move();
+      if (!block.stopped) {
+        block.move();
+      }
       block.resetDirection();
       $("div[data-y='" + block.position.y + "'] div[data-x='" + block.position.x + "']").addClass('block');
     });
@@ -61,6 +63,8 @@ var view = {
 
 var model = {
 
+  currentBlock: new Block(1, 1),
+
   blocks: [],
 
   gridSize: 10,
@@ -75,6 +79,10 @@ var model = {
             block.position.x < 1 ||
             block.position.y < 1 ||
             Math.abs(block.position.y) >= model.gridSize);
+  },
+
+  hitBlock: function(block) {
+    return $("div[data-y='" + (block.position.y + 1) + "'] div[data-x='" + block.position.x + "']").hasClass('block');
   }
 };
 
@@ -82,16 +90,22 @@ var controller = {
 
   // create a gameloop var, look how to set setInterval time
   init: function() {
-    var newBlock = new Block(1, 1);
-    model.blocks.push(newBlock);
+    model.blocks.push(model.currentBlock);
 
     setInterval(function() {
-      if (model.hitWall(newBlock)) {
-        console.log("u ded");
-      } else {
-        view.init(newBlock);
-      }
+      controller.gameLoop();
     }, 500);
+  },
+
+  gameLoop: function() {
+    if (model.hitWall(model.currentBlock) || model.hitBlock(model.currentBlock)) {
+      model.currentBlock.stopped = true;
+      model.currentBlock = new Block(2, 2);
+      model.blocks.push(model.currentBlock);
+      view.init(model.currentBlock);
+    } else {
+      view.init(model.currentBlock);
+    }
   },
 
   setCurrentDirection: function(dir) {
