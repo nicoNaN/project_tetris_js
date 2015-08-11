@@ -94,12 +94,15 @@ var controller = {
 
     setInterval(function() {
       controller.gameLoop();
-    }, 500);
+    }, 100);
   },
 
   gameLoop: function() {
     if (model.hitWall(model.currentBlock) || model.hitBlock(model.currentBlock)) {
       model.currentBlock.stopped = true;
+      if (this.rowIsFull(model.currentBlock)) {
+        controller.clearRow(model.currentBlock);
+      }
       model.currentBlock = new Block(2, 1);
       model.blocks.push(model.currentBlock);
       view.init(model.currentBlock);
@@ -112,9 +115,16 @@ var controller = {
     model.currentDirection = dir;
   },
 
-  clearRow: function() {
+  rowIsFull: function(block) {
+    return ($(".row[data-y=" + block.position.y + "]").children().not('.block').length === 0);
     // should maybe be in the view
     // clears the blocks in a filled row
+  },
+
+  clearRow: function(block) {
+    model.blocks = model.blocks.filter(function(el) {
+      return el.position.y !== 10;
+    })
   },
 
   shiftDown: function() {
