@@ -22,4 +22,4 @@ Block.prototype.move = function() {
 
 Block.prototype.resetDirection = function() {
   this.currentDirection = "down";
-}
+};

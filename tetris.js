@@ -28,7 +28,7 @@ var view = {
 
   addRowsCols: function(board, numColumns, rowVal) {
     board.append("<div class='row'" + " data-y=" + rowVal + "></div>");
-    for (var i = 1; i < numColumns; i++) {
+    for (var i = 1; i <= numColumns; i++) {
       $("#tetris-grid .row").last().append("<div class='col'" +
                                           " data-x=" +
                                           i +
@@ -105,7 +105,7 @@ var controller = {
         controller.clearRow(model.currentBlock);
         controller.shiftDown();
       }
-      model.currentBlock = new Block(5, 1);
+      model.currentBlock = new Block(Math.floor((Math.random() * 10 ) + 1), 1);
       model.blocks.push(model.currentBlock);
       view.init(model.currentBlock);
     } else {
@@ -124,7 +124,7 @@ var controller = {
   clearRow: function(block) {
     model.blocks = model.blocks.filter(function(el) {
       return el.position.y !== 10;
-    })
+    });
   },
 
   shiftDown: function() {
