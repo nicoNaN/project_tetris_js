@@ -44,7 +44,7 @@ var view = {
       }
 
       block.resetDirection();
-      $("div[data-y='" + block.position.y + "'] div[data-x='" + block.position.x + "']").addClass('block');
+      block.render();
     });
   },
 
@@ -61,7 +61,8 @@ var view = {
 
 var model = {
 
-  currentBlock: new Block(5, 1),
+  currentBlock: new Block("O", 5, 2),
+  blockTypes: ["O", "I", "S", "Z"],
 
   blocks: [],
 
@@ -73,17 +74,17 @@ var model = {
   },
 
   hitBottom: function(block) {
-    return (block.position.y < 1 ||
-            Math.abs(block.position.y) >= model.gridSize);
+    return (Math.abs(block.position.y1) >= model.gridSize);
   },
 
   hitBlock: function(block) {
-    return $("div[data-y='" + (block.position.y + 1) + "'] div[data-x='" + block.position.x + "']").hasClass('block');
+    return $("div[data-y='" + (block.position.y1 + 1) + "'] div[data-x='" + block.position.x1 + "']").hasClass('block') ||
+           $("div[data-y='" + (block.position.y1 + 1) + "'] div[data-x='" + block.position.x2 + "']").hasClass('block');
   },
 
   hitSide: function(block) {
-    return( block.position.x + 1 >= 10 ||
-            block.position.x - 1 < 1);
+    return( block.position.x1 >= 10 ||
+            block.position.x3 <= 1);
   }
 };
 
@@ -105,7 +106,7 @@ var controller = {
         controller.clearRow(model.currentBlock);
         controller.shiftDown();
       }
-      model.currentBlock = new Block(Math.floor((Math.random() * 10 ) + 1), 1);
+      model.currentBlock = new Block(model.blockTypes[Math.floor(Math.random() * model.blockTypes.length)], Math.floor((Math.random() * 10 ) + 1), 1);
       model.blocks.push(model.currentBlock);
       view.init(model.currentBlock);
     } else {
@@ -118,18 +119,21 @@ var controller = {
   },
 
   rowIsFull: function(block) {
-    return ($(".row[data-y=" + block.position.y + "]").children().not('.block').length === 0);
+    return ($(".row[data-y=" + block.position.y1 + "]").children().not('.block').length === 0);
   },
 
   clearRow: function(block) {
     model.blocks = model.blocks.filter(function(el) {
-      return el.position.y !== 10;
+      return el.position.y1 !== 20;
     });
   },
 
   shiftDown: function() {
     model.blocks.forEach(function(block) {
-      block.position.y++;
+      block.position.y1++;
+      block.position.y2++;
+      block.position.y3++;
+      block.position.y4++;
     });
     // should maybe be in the view
   }
